@@ -3,7 +3,7 @@ console.log("Hello CLI!");
 let x = [], bzX = 0;  //x = [5, 10, 8, 5]
 let y = [], bzY = 0;  //y = [2, 7, 9, 9]
 
-const func1 = () => {
+const isTextEntered = () => {
 
     let rawItem = 0;
     const matrixOrigin = document.getElementById("originalMatrix").value.split(',').map(item => parseFloat(item));
