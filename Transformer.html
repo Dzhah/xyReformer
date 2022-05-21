@@ -1,26 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Transformer</title>
-</head>
+  </head>
 
-<body>
-
-    <h1>Hello World !</h1>
-    38.517899,68.747037,38.518054,68.747001,38.518264,68.748494,38.518109,68.74853<br>
-    <input style="width:50em; font-family: Calibri; font-size: 16pt" type="text" id="originalMatrix" onfocusout="func1()">
+  <body>
+    <h1>Hello Calc !</h1>
+    38.515414,68.746179,38.515569,68.746143,38.515786,68.747685,38.515631,68.74772<br />
     <!-- <button type="submit" id="save" onclick="func1()">GO!</button -->
-
-    <br>
-    <br>
-    <br>
-    <textarea style="font-family: Calibri; font-size: 16pt; min-width:50em; max-width: 50em" name="comment" id="txtField">бла бла бла бщщщщ-бщщщщ бла бла</textarea>
-
-</body>
-<script src="scrpt.js"></script>
-
+    <textarea
+      style="
+        font-family: Calibri;
+        font-size: 16pt;
+        min-width: 50em;
+        max-width: 50em;
+      "
+      name="input"
+      id="inputMassive"
+      onfocusout="isTextEntered()"
+    ></textarea>
+    <br />
+    <br />
+    <input
+      style="width: 5em; font-family: Calibri; font-size: 16pt"
+      type="text"
+      id="inputAngle"
+      onfocusout="isTextEntered()"
+      value="0.0"
+    />
+    <input
+      style="width: 5em; font-family: Calibri; font-size: 16pt"
+      type="text"
+      id="inputWidth"
+      onfocusout="isTextEntered()"
+      value="600"
+    />
+    <input
+      style="width: 38.8em; font-family: Calibri; font-size: 16pt"
+      type="text"
+      id="inputPointToMove"
+      onfocusout="isTextEntered()"
+      value="0.0, 0.0"
+    />
+    <br />
+    <br />
+    <textarea
+      style="
+        font-family: Calibri;
+        font-size: 16pt;
+        min-height: 10em;
+        min-width: 50em;
+        max-width: 50em;
+      "
+      name="output"
+      id="outputTextField"
+    ></textarea>
+  </body>
+  <script src="scrpt.js"></script>
 </html>
