@@ -149,6 +149,15 @@ function maxSide(x, y) {
   return [iMax, iiMax];
 }
 
+function reviewAngle(xRv, yRv) {
+  return arctg(yRv / (xRv * 1.278481));
+}
+
+function reviewLong(lng, anAngle) {
+  //длина*(1+0.278481*cos(a)) когда вертикально - cos=0 а коэфф=1 , Когда горизонтально cos=1 а коэфф=1.278481
+  return lng * (1 + 0.278481 * Math.cos(anAngle));
+}
+
 function Distance(x1, y1, x2, y2) {
   return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 }
@@ -225,5 +234,12 @@ console.log(sumWithInitial);
 2560				2560
 0.0000003353515625	0.0000002623046875
 x/y = 1.278481
+длина*(1+0.278481*cos(a)) когда вертикально - cos=0 а коэфф=1 , Когда горизонтально cos=1 а коэфф=1.278481	
+      
+tg(a) = y/(x*1.278481) = y/x * 1/1.278481
+a = arctg (y/x * 1/1.278481)
+
+ 	
+
 */
 /* #endregion */
