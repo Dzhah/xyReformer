@@ -9,7 +9,8 @@
 
   <body>
     <h1>Hello Calc !</h1>
-    38.515414,68.746179,38.515569,68.746143,38.515786,68.747685,38.515631,68.74772<br />
+    38.515414,68.746179,38.515569,68.746143,38.515786,68.747685,38.515631,68.74772
+    &nbsp; &nbsp; &nbsp; 38.511905° 68.752881°<br />
     <!-- <button type="submit" id="save" onclick="func1()">GO!</button -->
     <textarea
       style="
@@ -19,30 +20,30 @@
         max-width: 50em;
       "
       name="input"
-      id="inputMassive"
-      onfocusout="isTextEntered()"
+      id="polygonVerticesID"
+      onfocusout="isPolygonVertices()"
     ></textarea>
     <br />
     <br />
     <input
       style="width: 5em; font-family: Calibri; font-size: 16pt"
       type="text"
-      id="inputAngle"
-      onfocusout="isTextEntered()"
+      id="angleToRotateID"
+      onfocusout="isAngleToRotate()"
       value="0.0"
     />
     <input
       style="width: 5em; font-family: Calibri; font-size: 16pt"
       type="text"
-      id="inputWidth"
-      onfocusout="isTextEntered()"
+      id="polygoneWidthID"
+      onfocusout="isPolygoneWidth()"
       value="600"
     />
     <input
       style="width: 38.8em; font-family: Calibri; font-size: 16pt"
       type="text"
-      id="inputPointToMove"
-      onfocusout="isTextEntered()"
+      id="pointToMoveXYID"
+      onfocusout="isPointToMoveXY()"
       value="0.0, 0.0"
     />
     <br />

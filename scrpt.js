@@ -10,19 +10,22 @@ let l = []; //абсолютные длины сторон полигона
 let a = []; //абсолютные углы наклона сторон полигона в радианах
 let xInitial = 0;
 let yInitial = 0; //"Центр масс" - начальные усреднённые X и Y полигона
+let xPointToMove = 0; // X,Y координаты целевой точки, для возможного перемещения полигона. Если заданно 0,0 то при первом
+let yPointToMove = 0; //     определении они приравниваются к xInitial, yInitial
 let lngth = 0; //количество углов/граней полигона
 /* #endregion */
-// ------------------ основная функция подсчёта по потере фокуса с окна ввода -----------------------
-const isTextEntered = () => {
-  const matrixOrigin = document
-    .getElementById("inputMassive")
+
+// ~~~ Функция обработки окна ввода _КООРДИНАТ_ВЕРШИН_ПОЛИГОНА_ ~~~
+let isPolygonVertices = () => {
+  let polygonVerticesString = document
+    .getElementById("polygonVerticesID")
     .value.split(",")
     .map((item) => parseFloat(item));
-  const length = matrixOrigin.length - 1;
+  let length = polygonVerticesString.length - 1;
   /* #region  Сортируем входную строку на два массива X[] и Y[] */
   for (let i = 0; i < length; i += 2) {
-    y.push(matrixOrigin[i]);
-    x.push(matrixOrigin[i + 1]);
+    y.push(polygonVerticesString[i]);
+    x.push(polygonVerticesString[i + 1]);
   }
   /* #endregion */
   /* #region  Вычисляем среднее X и среднее Y - то есть "центр массы" полигона */
@@ -57,7 +60,8 @@ const isTextEntered = () => {
     console.log("массив углов сторон\n" + a); // 0.000132585952205435 < ? < 0.000185620333087609;  600 это 0.0015571939506689588 юзать Math.abs() и Math.sign(x)
     /* #endregion */
     const wPolygone =
-      0.00000026517190441087 * document.getElementById("inputWidth").value;
+      0.00000026517190441087 *
+      document.getElementById("polygonVerticesID").value;
     x[iiEnd] =
       x[iEnd] + 1.278481 * wPolygone * Math.cos(a[iStart] - 1.5707963268);
     y[iiEnd] = y[iEnd] + wPolygone * Math.sin(a[iStart] - 1.5707963268);
@@ -132,8 +136,37 @@ const isTextEntered = () => {
   }
 };
 
+// ~~~ Функция обработки окна ввода _УГЛА_ПОВОРОТА_ ~~~
+let isAngleToRotate = () => {
+  let angleToRotate = parseFloat(
+    document.getElementById("angleToRotateID").value.replace(",", ".")
+  );
+  document.getElementById("angleToRotateID").value = angleToRotate;
+};
+
+// ~~~ Функция обработки окна ввода _ШИРИНЫ_ПОЛИГОНА_ ~~~
+let isPolygoneWidth = () => {
+  let polygoneWidth = parseFloat(
+    document.getElementById("polygoneWidthID").value.replace(",", ".")
+  );
+  document.getElementById("polygoneWidthID").value = polygoneWidth;
+  console.log("polygoneWidthID = ", polygoneWidth);
+};
+
+// ~~~ Функция обработки окна ввода _КООРДИНАТЫ_ПЕРЕМЕЩЕНИЯ_ полигона ~~~
+let isPointToMoveXY = () => {
+  let pointToMove = document.getElementById("pointToMoveXYID").value;
+  pointToMove = pointToMove.replace("°", ",");
+  pointToMove = pointToMove.split(",");
+  pointToMove = pointToMove.map((item) => parseFloat(item));
+  xPointToMove = pointToMove[0] > 50 ? pointToMove[0] : pointToMove[1];
+  yPointToMove = pointToMove[1] < 50 ? pointToMove[1] : pointToMove[0];
+  document.getElementById("pointToMoveXYID").value =
+    xPointToMove + ", " + yPointToMove;
+};
+
+// ~~~ Функция определение индексов координат начала и конца наибольшей грани полигона ~~~
 function maxSide(x, y) {
-  // определение индексов координат начала и конца наибольшей грани полигона
   let max = 0,
     iMax = 0,
     iiMax = 0,
@@ -188,14 +221,14 @@ const func1 = () => {
     let y = [];
 
     let rawItem;
-    const matrixOrigin = document.getElementById("originalMatrix").value.split(',').map(item => parseFloat(item));
-    for (const item of matrixOrigin) {
+    const polygonVerticesString = document.getElementById("originalMatrix").value.split(',').map(item => parseFloat(item));
+    for (const item of polygonVerticesString) {
         rawItem = Math.floor(item);
         if (rawItem >= 67 && rawItem <= 75){x.push(item)};
         if (rawItem >= 36 && rawItem <= 41){y.push(item)};
         // console.log(item,x,y);
     }
-    console.log(matrixOrigin);
+    console.log(polygonVerticesString);
     console.log(x);
     console.log(y);
 
