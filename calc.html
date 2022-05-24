@@ -27,7 +27,7 @@
   width: 500px;
   border-radius: 8px;
   padding: 40px 40px;
-  box-shadow: 0 10px 25px rgba(106, 20, 138, .2);
+  box-shadow: 0 10px 25px rgba(55, 20, 155, .2);
 }
 
 .title {
@@ -107,21 +107,22 @@
   top: -7px;
   left: 10px;
   z-index: 10;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: purple;
 }
 
 .input:not(:placeholder-shown)+ .label {
   top: -7px;
-  left: 3px;
+  left: 10px;
   z-index: 10;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .input:focus {
-  border: 2px solid purple;
+  border: 2px solid #d3a7d3;
+
 }
   </style>
 </head>
@@ -136,7 +137,7 @@
       </div>	
 
       <div class="inputContainer">
-        <input type="text" class="input" placeholder="a">
+        <input type="text" class="input" placeholder="a" value="0.0">
         <label for="" class="label">Angle</label>
       </div>	  
 	  
@@ -153,12 +154,12 @@
       </div> -->
 
       <div class="inputContainer">
-        <input type="text" class="input" placeholder="a">
+        <input type="text" class="input" placeholder="a" value="600">
         <label for="" class="label">Width</label>
       </div>
 
       <div class="inputContainer">
-        <input type="text" class="input" placeholder="a">
+        <input type="text" class="input" placeholder="a" value="0.0, 0.0">
         <label for="" class="label">Point to Move</label>
       </div>
 	  

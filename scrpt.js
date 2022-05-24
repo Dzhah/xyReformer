@@ -1,18 +1,16 @@
 /* #region  Глобальные переменные */
-let maxSideAngle = 0; // Угол наклона наидлиннейшей стороны полигона (радианы)
 let polygoneWidth = 0; // Скорректированная, с учётом х-сжатого визуального холста карты, ширина полигона которую надо обеспечить в результате
 let angleToRotate = 0; // Скорректированный, с учётом х-сжатого визуального холста карты, угол в радианах на который надо повернуть полигон (если надо)
-let x = [];
-let y = []; //X и Y - отфильтрованные и отсортированные массивы начальных ОТНОСИТЕЛЬНЫХ координат вершин исходного полигона
-let xA = [];
-let yA = []; //X и Y - отфильтрованные и отсортированные массивы начальных абсолютных координат вершин исходного полигона
-let l = []; //абсолютные длины сторон полигона
-let a = []; //абсолютные углы наклона сторон полигона в радианах
-let xInitial = 0;
-let yInitial = 0; //"Центр масс" - начальные усреднённые X и Y полигона
 let xPointToMove = 0; // X,Y координаты целевой точки, для возможного перемещения полигона. Если заданно 0,0 то при первом
 let yPointToMove = 0; //     определении они приравниваются к xInitial, yInitial
-let lngth = 0; //количество углов/граней полигона
+let x = [];
+let y = []; //X и Y - отфильтрованные и отсортированные массивы начальных визуальных ОТНОСИТЕЛЬНЫХ координат вершин исходного полигона
+let xInitial = 0;
+let yInitial = 0; //"Центр масс" - начальные усреднённые X и Y полигона
+let l = []; //абсолютные длины сторон полигона
+let a = []; //абсолютные углы наклона сторон полигона в радианах
+let maxSideAngle = 0; // Угол наклона наидлиннейшей стороны полигона (радианы)
+let polygonEdgesNumber = 0; //количество углов/граней полигона polygonEdgesNumber
 /* #endregion */
 
 // ~~~ Функция обработки окна ввода _КООРДИНАТ_ВЕРШИН_ПОЛИГОНА_ ~~~
@@ -27,39 +25,53 @@ let isPolygonVertices = () => {
     y.push(polygonVerticesString[i]);
     x.push(polygonVerticesString[i + 1]);
   }
-  /* #endregion */
-  /* #region  Вычисляем среднее X и среднее Y - то есть "центр массы" полигона */
+  if (x.length != y.length) {
+    alert(
+      "Что-то не так с введёнными координатами! Число X-координат не равно числу Y-координат!!!",
+      x.length,
+      y.length
+    );
+  }
+  polygonEdgesNumber = length;
+  console.log("~~~~ polygonEdgesNumber = ", x.length, y.length);
+  polygonCenterCalculation();
+  absoluteToRelativeCoordinatesConversion();
+};
+/* #endregion */
+
+// ~~~ Функция вычисления среднего X и среднего Y координат вершин полигона - то есть его "центр масс"
+function polygonCenterCalculation() {
   let initX = 0;
   let initY = 0;
   xInitial =
     x.reduce(
       (previousValue, currentValue) => previousValue + currentValue,
       initX
-    ) / x.length;
+    ) / polygonEdgesNumber;
   yInitial =
     y.reduce(
       (previousValue, currentValue) => previousValue + currentValue,
       initY
-    ) / y.length;
-  /* #endregion */
-  /* #region  Преобразуем абсолютные координаты в относительные */
+    ) / polygonEdgesNumber;
+}
+
+// ~~~ Функция преобразования абсолютных координат вершин полигона в относительные
+function absoluteToRelativeCoordinatesConversion() {
   x = x.map((i) => Math.round((i - xInitial) * 10000000) / 10000000);
   y = y.map((i) => Math.round((i - yInitial) * 10000000) / 10000000);
-  /* #endregion */
-
+  /* #region  Вывод в консоль */
   console.log("массив относительных координат X\n" + x);
   console.log("массив относительных координат Y\n" + y);
-
-  lngth = x.length;
-  if (lngth === y.length && lngth === 4) {
-    let [iStart, iEnd] = maxSide(x, y); // 1. Определили наибольшую сторону. iStart, iEnd - индексы начальной и конечной точек наибольшей стороны полигона.
+  /* #endregion */
+  if (polygonEdgesNumber === 4) {
+    let [iStart, iEnd] = maxSideIdxs(x, y); // 1. Определили наибольшую сторону. iStart, iEnd - индексы начальной и конечной точек наибольшей стороны полигона.
     let iiEnd = (iEnd + 1) * (iEnd != 3); // Определяем индекс третьей точки
     let iiiEnd = (iiEnd + 1) * (iiEnd != 3); // Определяем индекс четвёртой точки. Число Пи примерно 1,5707963. Math.round(l/0.00000026517190441087) = 600
     /* #region  Вывод в консоль */
     console.log("массив длин сторон\n" + l);
     console.log("массив углов сторон\n" + a); // 0.000132585952205435 < ? < 0.000185620333087609;  600 это 0.0015571939506689588 юзать Math.abs() и Math.sign(x)
     /* #endregion */
-    const wPolygone =
+    const wPolygone = // TODO: тут вообще перевод с умножениями на 0.00000026517190441087 лишний. НО - НЕ ЗАБУДЬ про перевод ширины с 600!!!
       0.00000026517190441087 *
       document.getElementById("polygonVerticesID").value;
     x[iiEnd] =
@@ -134,7 +146,7 @@ let isPolygonVertices = () => {
     );
     /* #endregion */
   }
-};
+}
 
 // ~~~ Функция обработки окна ввода _УГЛА_ПОВОРОТА_ ~~~
 let isAngleToRotate = () => {
@@ -166,13 +178,13 @@ let isPointToMoveXY = () => {
 };
 
 // ~~~ Функция определение индексов координат начала и конца наибольшей грани полигона ~~~
-function maxSide(x, y) {
-  let max = 0,
-    iMax = 0,
-    iiMax = 0,
-    ii = 0;
-  for (let i = 0; i < lngth; i++) {
-    i < lngth - 1 ? (ii = i + 1) : (ii = 0);
+function maxSideIdxs(x, y) {
+  let max = 0;
+  let iMax = 0;
+  let iiMax = 0;
+  let ii = 0;
+  for (let i = 0; i < polygonEdgesNumber; i++) {
+    i < polygonEdgesNumber - 1 ? (ii = i + 1) : (ii = 0);
     dist = Distance(x[i], y[i], x[ii], y[ii]);
     a.push(Angle(x[i], y[i], x[ii], y[ii]));
     l.push(dist);
