@@ -1,64 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Transformer</title>
-  </head>
 
-  <body>
-    <h1>Hello Calc !</h1>
-    38.515414,68.746179,38.515569,68.746143,38.515786,68.747685,38.515631,68.74772
-    &nbsp; &nbsp; &nbsp; 38.511905° 68.752881°<br />
-    <!-- <button type="submit" id="save" onclick="func1()">GO!</button -->
-    <textarea
-      style="
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transformer</title>
+</head>
+
+<body>
+  <h1>Hello Calc !</h1>
+  38.515414,68.746179,38.515569,68.746143,38.515786,68.747685,38.515631,68.74772
+  &nbsp; &nbsp; &nbsp; 38.511905° 68.752881°<br />
+  <!-- <button type="submit" id="save" onclick="func1()">GO!</button -->
+  <textarea style="
         font-family: Calibri;
         font-size: 16pt;
         min-width: 50em;
         max-width: 50em;
-      "
-      name="input"
-      id="polygonVerticesID"
-      onfocusout="isPolygonVertices()"
-    ></textarea>
-    <br />
-    <br />
-    <input
-      style="width: 5em; font-family: Calibri; font-size: 16pt"
-      type="text"
-      id="angleToRotateID"
-      onfocusout="isAngleToRotate()"
-      value="0.0"
-    />
-    <input
-      style="width: 5em; font-family: Calibri; font-size: 16pt"
-      type="text"
-      id="polygoneWidthID"
-      onfocusout="isPolygoneWidth()"
-      value="600"
-    />
-    <input
-      style="width: 38.8em; font-family: Calibri; font-size: 16pt"
-      type="text"
-      id="pointToMoveXYID"
-      onfocusout="isPointToMoveXY()"
-      value="0.0, 0.0"
-    />
-    <br />
-    <br />
-    <textarea
-      style="
+      " name="input" id="polygonVerticesID" onfocusout="isPolygonVertices()"></textarea>
+  <br />
+  <br />
+  <input style="width: 5em; font-family: Calibri; font-size: 16pt" type="text" id="polygonAngleID"
+    onfocusout="isPolygonAngle()" value="0.0" />
+  <input style="width: 5em; font-family: Calibri; font-size: 16pt" type="text" id="polygoneWidthID"
+    onfocusout="isPolygoneWidth()" value="600" />
+  <input style="width: 38.8em; font-family: Calibri; font-size: 16pt" type="text" id="pointToMoveXYID"
+    onfocusout="isPointToMoveXY()" value="0.0, 0.0" />
+  <br />
+  <br />
+  <textarea style="
         font-family: Calibri;
         font-size: 16pt;
         min-height: 10em;
         min-width: 50em;
         max-width: 50em;
-      "
-      name="output"
-      id="outputTextField"
-    ></textarea>
-  </body>
-  <script src="scrpt.js"></script>
+      " name="output" id="outputTextField"></textarea>
+</body>
+<script src="scrpt.js"></script>
+
 </html>
