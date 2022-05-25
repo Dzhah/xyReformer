@@ -4,7 +4,9 @@ let polygonAngleRad = 0; // Скорректированный, с учётом 
 let xPointToMove = 0; // X,Y координаты целевой точки, для возможного перемещения полигона. Если заданно 0,0 то при первом
 let yPointToMove = 0; //     определении они приравниваются к xInitial, yInitial
 let x = [];
-let y = []; //X и Y - отфильтрованные и отсортированные массивы начальных визуальных ОТНОСИТЕЛЬНЫХ координат вершин исходного полигона
+let y = []; //X и Y - отфильтрованные и отсортированные массивы начальных визуальных АБСОЛЮТНЫХ координат вершин исходного полигона
+let xR = [];
+let yR = []; //X и Y - отфильтрованные и отсортированные массивы начальных визуальных ОТНОСИТЕЛЬНЫХ координат вершин исходного полигона
 let xInitial = 0;
 let yInitial = 0; //"Центр масс" - начальные усреднённые X и Y полигона
 let l = []; //абсолютные длины сторон полигона
@@ -16,54 +18,45 @@ let polygonEdgesNumber = 0; //количество углов/граней по�
 
 // ~~~ Функция обработки окна ввода _КООРДИНАТ_ВЕРШИН_ПОЛИГОНА_ ~~~
 let isPolygonVertices = () => {
-   let polygonVerticesString = document
-      .getElementById("polygonVerticesID")
-      .value.split(",")
-      .map((item) => parseFloat(item));
+   let polygonVerticesString = document.getElementById("polygonVerticesID").value.split(",").map((item) => parseFloat(item));
    let length = polygonVerticesString.length - 1;
    /* #region  Сортируем входную строку на два массива X[] и Y[] */
    for (let i = 0; i < length; i += 2) {
       y.push(polygonVerticesString[i]);
       x.push(polygonVerticesString[i + 1]);
-   }
-   if (x.length != y.length) {
-      alert(
-         "Что-то не так с введёнными координатами! Число X-координат не равно числу Y-координат!!!",
-         x.length,
-         y.length
-      );
-   }
-   polygonEdgesNumber = length;
-   console.log("~~~~ polygonEdgesNumber = ", x.length, y.length);
+   };
+   
+   if (x.length != y.length) { alert( "Что-то не так с введёнными координатами! Число X-координат не равно числу Y-координат!!!", x.length, y.length ); };
+   polygonEdgesNumber = x.length;
    polygonCenterCalculation();
    absoluteToRelativeCoordinatesConversion();
 };
+  
 /* #endregion */
 
 // ~~~ Функция вычисления среднего X и среднего Y координат вершин полигона - то есть его "центр масс"
 function polygonCenterCalculation() {
    let initX = 0;
    let initY = 0;
-   xInitial =
-      x.reduce(
-         (previousValue, currentValue) => previousValue + currentValue,
-         initX
-      ) / polygonEdgesNumber;
-   yInitial =
-      y.reduce(
-         (previousValue, currentValue) => previousValue + currentValue,
-         initY
-      ) / polygonEdgesNumber;
+   xInitial = r07(x.reduce( (previousValue, currentValue) => previousValue + currentValue, initX ) / polygonEdgesNumber);
+   yInitial = r07(y.reduce( (previousValue, currentValue) => previousValue + currentValue, initY ) / polygonEdgesNumber);
+   xPointToMove = xPointToMove ? xPointToMove : xInitial;
+   yPointToMove = yPointToMove ? yPointToMove : yInitial;
+   document.getElementById("pointToMoveXYID").value = xPointToMove + ', ' + yPointToMove;
 }
 
 // ~~~ Функция преобразования абсолютных координат вершин полигона в относительные
 function absoluteToRelativeCoordinatesConversion() {
-   x = x.map((i) => Math.round((i - xInitial) * 10000000) / 10000000);
-   y = y.map((i) => Math.round((i - yInitial) * 10000000) / 10000000);
-   /* #region  Вывод в консоль */
-   console.log("массив относительных координат X\n" + x);
-   console.log("массив относительных координат Y\n" + y);
-   /* #endregion */
+   xR = x.map((item) => (r07(item - xInitial)));
+   yR = y.map((item) => (r07(item - yInitial)));
+
+// XXX  -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+
+
+
+
+
+
    if (polygonEdgesNumber === 4) {
       let [iStart, iEnd] = maxSideIdxs(x, y); // 1. Определили наибольшую сторону. iStart, iEnd - индексы начальной и конечной точек наибольшей стороны полигона.
       let iiEnd = (iEnd + 1) * (iEnd != 3); // Определяем индекс третьей точки
@@ -72,84 +65,20 @@ function absoluteToRelativeCoordinatesConversion() {
       console.log("массив длин сторон\n" + l);
       console.log("массив углов сторон\n" + a); // 0.000132585952205435 < ? < 0.000185620333087609;  600 это 0.0015571939506689588 юзать Math.abs() и Math.sign(x)
       /* #endregion */
-      const wPolygone = // TODO: тут вообще перевод с умножениями на 0.00000026517190441087 лишний. НО - НЕ ЗАБУДЬ про перевод ширины с 600!!!
-         0.00000026517190441087 *
-         document.getElementById("polygonVerticesID").value;
-      x[iiEnd] =
-         x[iEnd] + 1.278481 * wPolygone * Math.cos(a[iStart] - 1.5707963268);
+      // TODO: тут вообще перевод с умножениями на 0.00000026517190441087 лишний. НО - НЕ ЗАБУДЬ про перевод ширины с 600!!!
+      const wPolygone = 0.00000026517190441087 * document.getElementById("polygonVerticesID").value;
+      x[iiEnd] = x[iEnd] + 1.278481 * wPolygone * Math.cos(a[iStart] - 1.5707963268);
       y[iiEnd] = y[iEnd] + wPolygone * Math.sin(a[iStart] - 1.5707963268);
 
       dX = x[iEnd] - x[iStart];
       dY = y[iEnd] - y[iStart];
       x[iiiEnd] = x[iiEnd] - dX;
       y[iiiEnd] = y[iiEnd] - dY;
-      xA = x.map((i) => i + xInitial);
-      yA = y.map((i) => i + yInitial);
-      // Вывод в выходное окно результата
-      outputString =
-         yA[0] +
-         "," +
-         xA[0] +
-         "," +
-         yA[1] +
-         "," +
-         xA[1] +
-         "," +
-         yA[2] +
-         "," +
-         xA[2] +
-         "," +
-         yA[3] +
-         "," +
-         xA[3];
 
+      
+      // Вывод в выходное окно результата
+      outputString = yR[0] + "," + xR[0] + "," + yR[1] + "," + xR[1] + "," + yR[2] + "," + xR[2] + "," + yR[3] + "," + xR[3];
       document.getElementById("outputTextField").value = outputString;
-      /* #region  Вывод в консоль */
-      console.log(
-         "--------------- a[iStart] + 1.655477151 = ",
-         (a[iStart] * 180) / Math.PI,
-         (1.486115503 * 180) / Math.PI
-      );
-      console.log(
-         "координата третьей точки от наибольшей стороны =",
-         x[iiEnd],
-         y[iiEnd]
-      );
-      console.log(
-         "iStart, iEnd, iiEnd, iiiEnd, a[iStart] :",
-         iStart,
-         iEnd,
-         iiEnd,
-         iiiEnd,
-         a[iStart]
-      );
-      console.log("массив относительных координат X\n" + x);
-      console.log("массив относительных координат Y\n" + y);
-      console.log(
-         "массив абсолютных координат X\n" + x.map((i) => i + xInitial)
-      );
-      console.log(
-         "массив абсолютных координат Y\n" + y.map((i) => i + yInitial)
-      );
-      console.log(
-         "строка вывода абсолютных координат \n" +
-            yA[0] +
-            "," +
-            xA[0] +
-            "," +
-            yA[1] +
-            "," +
-            xA[1] +
-            "," +
-            yA[2] +
-            "," +
-            xA[2] +
-            "," +
-            yA[3] +
-            "," +
-            xA[3]
-      );
-      /* #endregion */
    }
 }
 
@@ -210,37 +139,41 @@ function maxSideIdxs(x, y) {
       }
    }
    return [iMax, iiMax];
-}
+};
 
 function reviewAngle(xRv, yRv) {
    return arctg(yRv / (xRv * 1.278481));
-}
+};
 
 function reviewLong(lng, anAngle) {
    //длина*(1+0.278481*cos(a)) когда вертикально - cos=0 а коэфф=1 , Когда горизонтально cos=1 а коэфф=1.278481
    return lng * (1 + 0.278481 * Math.cos(anAngle));
-}
+};
 
 function Distance(x1, y1, x2, y2) {
    return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
-}
+};
 
 function Ratio(x1, y1, x2, y2) {
    // вычисление отношения дельты Y к дельте X координат концов отрезка ->
    return (1.278481 * (y2 - y1)) / (x2 - x1); // -> то есть тангенса угла наклона этого отрезка
-}
+};
 
 function Goal(x, y, alfa, lng) {
    // вычисление координат целевой (второй) точки отрезка по заданному ->
    let xGoal = x + lng * Math.cos(alfa); // -> углу "alfa" (радианы) наклона к оси х и его длине "lng"
    let yGoal = y + lng * Math.sin(alfa);
    return [xGoal, yGoal];
-}
+};
 
 function Angle(x1, y1, x2, y2) {
    // вычисление угла наклона (радианы), к оси Х, грани, по координатам её концов
    return Math.atan(Ratio(x1, y1, x2, y2));
-}
+};
+
+function r07(q){
+   return Math.round(q * 10000000)/10000000;
+} ;
 
 /*
 const func1 = () => {
