@@ -14,6 +14,8 @@ let a = []; //абсолютные углы наклона сторон поли
 let maxSideAngle = 0; // Угол наклона наидлиннейшей стороны полигона (радианы)
 let polygonEdgesNumber = 0; //количество углов/граней полигона 
 let deltaAngleTmp = [];
+let nextDx = 0;
+let nextDy = 0;
 
 /* #endregion */
 
@@ -56,7 +58,7 @@ function absoluteToRelativeCoordinatesConversion() {
 function polygonOrthogonalization() {
 
    if (polygonEdgesNumber === 4) {
-      let [iStart, iEnd] = maxSideIdxs(x, y);        // Определили индексы координат вершин наибольшей стороны полигона - iStart, iEnd
+      let [iStart, iEnd] = maxSideIdxs();        // Определили индексы координат вершин наибольшей стороны полигона - iStart, iEnd
       let i3End = (iEnd + 1) % polygonEdgesNumber;   // Определяем индексы X,Y третьей вершины
       let i4End = (i3End + 1) % polygonEdgesNumber; // Определяем индексы X,Y четвёртой вершины 
 
@@ -66,33 +68,37 @@ function polygonOrthogonalization() {
             * Вообще не нужно что бы и прямоугольные  и многоуголные и любые полигоны обрабатывать - нужно только прямоугольные.
             * Остальные, отличные от прямоугольных, не обрабатываются на ортогональность, - только на поворот и перемещение.
             * ∆X=L/sqrt(1+(∆Y/k∆X)^2)
-            * ∆Y=L*(∆Y/∆X)/sqrt(1+(∆Y/k∆X)^2)
+            * ∆Y=L*(∆Y/k∆X)/sqrt(1+(∆Y/k∆X)^2)
             * */
+
+      let dYdX = (y[iEnd] - y[iStart]) / (x[iEnd] - x[iStart]);  
+      polygoneWidth = document.getElementById("polygoneWidthID").value
+
+      let incrementY = (polygoneWidth * 0.000000262) / Math.sqrt(1 + dYdX**2); 
+      let incrementX = (polygoneWidth * 0.000000262) * dYdX / Math.sqrt(1 + dYdX**2);
+      console.log('polygoneWidth :', polygoneWidth);
+
+      xR[i3End] = xR[iEnd] + 1.6345 * incrementX;
+      yR[i3End] = yR[iEnd] - incrementY;
+
+      xR[i4End] = xR[iStart] + 1.6345 * incrementX;
+      yR[i4End] = yR[iStart] - incrementY;
+
+
+
+
 
 
 
                                                                      
-      const wPolygone = 0.00000026517190441087 * document.getElementById("polygonVerticesID").value; // Определили "идеальную" высоту полигона l/0.00000026517190441087 = 600
 
-
-      x[i3End] = 1/a[iEnd] 
-
-
-      x[i3End] = x[iEnd] + 1.278481 * wPolygone * Math.cos(a[iStart] - 1.5707963268); // FIXME косинус это отношение! зачем считать косинус если можно подсчитать само отношение?
-      y[i3End] = y[iEnd] + wPolygone * Math.sin(a[iStart] - 1.5707963268); // FIXME По Y вообще коррекция не нужна - по этой оси ничего не искажается
-
-      dX = x[iEnd] - x[iStart];
-      dY = y[iEnd] - y[iStart];
-      x[i4End] = x[i3End] - dX;
-      y[i4End] = y[i3End] - dY;
 
       
       // Вывод в выходное окно результата
-      outputString = yR[0] + "," + xR[0] + "," + yR[1] + "," + xR[1] + "," + yR[2] + "," + xR[2] + "," + yR[3] + "," + xR[3];
+      outputString = (yR[0]+yPointToMove) + "," + (xR[0]+xPointToMove) + "," + (yR[1]+yPointToMove) + "," + (xR[1]+xPointToMove) + "," + (yR[2]+yPointToMove) + "," + (xR[2]+xPointToMove) + "," + (yR[3]+yPointToMove) + "," + (xR[3]+xPointToMove);
       document.getElementById("outputTextField").value = outputString;
    }
 }
-
 // ~~~ Функция обработки окна ввода _УГЛА_ПОВОРОТА_ ~~~
 let isPolygonAngle = () => {
    let polygonAngleRad = parseFloat(
@@ -130,7 +136,7 @@ function EnterPointToMove() {
 };
 
 // ~~~ Функция определение индексов координат начала и конца наибольшей грани полигона ~~~
-function maxSideIdxs(x, y) {
+function maxSideIdxs() {
    let max = 0;
    let iMax = 0;
    let iiMax = 0;
@@ -157,7 +163,7 @@ function maxSideIdxs(x, y) {
 // ~~~ Функция вычисления гипотенузы (длины грани полигона)
 function distance(x1, y1, x2, y2) { return Math.hypot(x1 - x2, y1 - y2) }; 
 // ~~~ Функция вычисления ИДЕАЛЬНОГО отношения ∆Y/(∆X*k) - тангенсов углов наклона граней полигона
-function ratio(x1, y1, x2, y2) { return (y2 - y1) / ((x2 - x1)); };
+function ratio(x1, y1, x2, y2) { return (y2 - y1) / (x2 - x1); };
 // ~~~ Функция округление до 7-го знака после запятой
 function r07(q){ return Math.round(q * 10000000)/10000000 } ;
 
@@ -195,3 +201,4 @@ i = 3, Разность углов (Next-i) = -90
 i = 3, Угол (i) = 10.2
 
 */
+
