@@ -6,7 +6,9 @@ let yPointToMove = 0; //     определении они приравнива�
 let x = [];
 let y = []; //X и Y - отфильтрованные и отсортированные массивы начальных визуальных АБСОЛЮТНЫХ координат вершин исходного полигона
 let xR = [];
-let yR = []; //X и Y - отфильтрованные и отсортированные массивы начальных визуальных ОТНОСИТЕЛЬНЫХ координат вершин исходного полигона
+let yR = []; //XR и YR - отфильтрованные и отсортированные массивы начальных визуальных ОТНОСИТЕЛЬНЫХ координат вершин исходного полигона
+let xFin = [];
+let yFin = []; //XFin и YFin - масси окончательных ОТНОСИТЕЛЬНЫХ координат вершин исходного полигона включающих поворот
 let xInitial = 0;
 let yInitial = 0; //"Центр масс" - начальные усреднённые X и Y полигона
 let l = []; //абсолютные длины сторон полигона
@@ -69,6 +71,8 @@ function polygonOrthogonalization() {
             * Остальные, отличные от прямоугольных, не обрабатываются на ортогональность, - только на поворот и перемещение.
             * ∆X=L/sqrt(1+(∆Y/k∆X)^2)
             * ∆Y=L*(∆Y/k∆X)/sqrt(1+(∆Y/k∆X)^2)
+            * x’=x∙cos(α)-y∙sin(α);
+            * y’=x∙sin(α)+y∙cos(α);
             * */
 
       let dYdX = (y[iEnd] - y[iStart]) / (x[iEnd] - x[iStart]);  
@@ -84,29 +88,29 @@ function polygonOrthogonalization() {
       xR[i4End] = xR[iStart] + 1.6345 * incrementX;
       yR[i4End] = yR[iStart] - incrementY;
 
+      // Считаем поворот на заданное кол-во градусов
 
-
-
-
-
-
-                                                                     
-
+      for (let i = 0; i < 4; i++) {
+         xFin[i] = r07(1.278481*(0.782178*xR[i]*Math.cos(-1*polygonAngleRad) - yR[i]*Math.sin(-1*polygonAngleRad)));
+         yFin[i] = r07(0.782178*xR[i]*Math.sin(-1*polygonAngleRad) + yR[i]*Math.cos(-1*polygonAngleRad));
+      }
 
       
       // Вывод в выходное окно результата
-      outputString = (yR[0]+yPointToMove) + "," + (xR[0]+xPointToMove) + "," + (yR[1]+yPointToMove) + "," + (xR[1]+xPointToMove) + "," + (yR[2]+yPointToMove) + "," + (xR[2]+xPointToMove) + "," + (yR[3]+yPointToMove) + "," + (xR[3]+xPointToMove);
-      document.getElementById("outputTextField").value = outputString;
+      let outputStringR = (yR[0]+yPointToMove) + "," + (xR[0]+xPointToMove) + "," + (yR[1]+yPointToMove) + "," + (xR[1]+xPointToMove) + "," + (yR[2]+yPointToMove) + "," + (xR[2]+xPointToMove) + "," + (yR[3]+yPointToMove) + "," + (xR[3]+xPointToMove);
+      let outputStringFin = (yFin[0]+yPointToMove) + "," + (xFin[0]+xPointToMove) + "," + (yFin[1]+yPointToMove) + "," + (xFin[1]+xPointToMove) + "," + (yFin[2]+yPointToMove) + "," + (xFin[2]+xPointToMove) + "," + (yFin[3]+yPointToMove) + "," + (xFin[3]+xPointToMove);
+
+      document.getElementById("outputTextField").value = outputStringR + "\n" + outputStringFin;
    }
 }
 // ~~~ Функция обработки окна ввода _УГЛА_ПОВОРОТА_ ~~~
 let isPolygonAngle = () => {
-   let polygonAngleRad = parseFloat(
+   polygonAngleRad = parseFloat(
       document.getElementById("polygonAngleID")
       .value.replace(",", ".")  * Math.PI / 180 //=1° × π/180
       );
    document.getElementById("polygonAngleID").value = polygonAngleRad * 180/Math.PI; //=1 рад × 180/π
-   console.log('polygonAngle :', polygonAngleRad);
+   console.log('polygonAngle в радианах :', polygonAngleRad);
 };
 
 // ~~~ Функция обработки окна ввода _ВЫСОТЫ_ПОЛИГОНА_ ~~~
