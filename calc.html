@@ -52,13 +52,22 @@
 		</div>	  
 	  </div>	  
 	  <div class="inputContainer" style = "height: 200px">
-		<textarea type="text" class="input" placeholder="a" style=" font-family: sans-serif; font-size: 16px; overflow: hidden;
+		<textarea type="text" class="input" placeholder="a" onfocusout="copyToClipboard()" style=" font-family: sans-serif; font-size: 16px; overflow: hidden;
 						min-height: 130px; max-height: 100px; min-width: 100%; max-width: 100%; padding-top: 10px; "
-			name="output" id="outputTextField" ></textarea>
+			name="output" id="outputTextFieldID" ></textarea>
 			<label for="" class="label">Output Result Coordinates</label>
       </div>
     </form>
   </div>
-
+<script>
+  function copyToClipboard() {
+    var copyText = document.getElementById("outputTextFieldID").value;
+    navigator.clipboard.writeText(copyText).then(() => {
+        // Alert the user that the action took place.
+        // Nobody likes hidden stuff being done under the hood!
+        console.log("Copied to clipboard");
+    });
+  }
+</script>
 </body>
 </html>
