@@ -19,11 +19,12 @@ let nextDx = 0;
 let nextDy = 0;
 /* #endregion */
 
-// ~~~ Функция обработки окна ввода _КООРДИНАТ_ВЕРШИН_ПОЛИГОНА_ ~~~
+// ~~~ Функция обработки окна ввода _КООРДИНАТ_ВЕРШИН_ПОЛИГОНА_ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 let isPolygonVertices = () => {
 
    let polygonVerticesString = document.getElementById("polygonVerticesID").value.split(",").map((item) => parseFloat(item));
-   x = y = [];
+   x = [];
+   y = [];
    let lng = polygonVerticesString.length - 1;
    for (let i = 0; i < lng; i += 2) {
       y.push(polygonVerticesString[i]);
@@ -40,10 +41,8 @@ let isPolygonVertices = () => {
 
 // ~~~ Функция вычисления среднего X и среднего Y координат вершин полигона - то есть его "центр масс"
 function polygonCenterCalculation() {
-   let initX = 0;
-   let initY = 0;
-   xInitial = r07(x.reduce( (previousValue, currentValue) => previousValue + currentValue, initX ) / polygonEdgesNumber);
-   yInitial = r07(y.reduce( (previousValue, currentValue) => previousValue + currentValue, initY ) / polygonEdgesNumber);
+   xInitial = x.reduce( (i, ii) => i + ii, 0) / polygonEdgesNumber;
+   yInitial = y.reduce( (i, ii) => i + ii, 0) / polygonEdgesNumber;
    xPointToMove = xInitial;
    yPointToMove = yInitial;
    document.getElementById("pointToMoveXYID").value = xPointToMove + ', ' + yPointToMove;
@@ -51,8 +50,11 @@ function polygonCenterCalculation() {
 
 // ~~~ Функция преобразования абсолютных координат вершин полигона в относительные
 function absoluteToRelativeCoordinatesConversion() {
-   xR = x.map((item) => (r07(item - xInitial)));
-   yR = y.map((item) => (r07(item - yInitial)));
+   xR = x.map((item) => (item - xInitial));
+   console.log('xR :', xR);
+   yR = y.map((item) => (item - yInitial));
+   console.log('yR :', yR);
+
 };
 
 // ~~~ Функция ортогонализации полигона
@@ -61,7 +63,8 @@ function polygonOrthogonalization() {
       let [iStart, iEnd] = maxSideIdxs();
       let i3End = (iEnd + 1) % polygonEdgesNumber;
       let i4End = (i3End + 1) % polygonEdgesNumber;
-      let dYdX = (y[iEnd] - y[iStart]) / (x[iEnd] - x[iStart]);  
+      let tmpDiff = (x[iEnd] - x[iStart]) ? (x[iEnd] - x[iStart]) : 0.0000000000000000001;
+      let dYdX = (y[iEnd] - y[iStart]) / tmpDiff;
       maxSideAngle = Math.atan(dYdX);
       polygoneWidth = document.getElementById("polygoneWidthID").value;
       truePolygoneWidth = polygoneWidth / (1+0.278481*Math.abs(Math.sin(maxSideAngle)))
@@ -71,6 +74,18 @@ function polygonOrthogonalization() {
       yR[i3End] = yR[iEnd] - 0.782178 * incrementY;
       xR[i4End] = xR[iStart] + 1.278481 * 1.278481 * incrementX;
       yR[i4End] = yR[iStart] - 0.782178 * incrementY;
+      let massPoint = xR[iStart] + xR[iEnd] + xR[i3End] + xR[i4End] + yR[iStart] + yR[iEnd] + yR[i3End] + yR[i4End];
+      let xAlt = xR.slice();
+      let yAlt = yR.slice();
+      xAlt[i3End] = xR[iEnd] - 1.278481 * 1.278481 * incrementX;
+      yAlt[i3End] = yR[iEnd] + 0.782178 * incrementY;
+      xAlt[i4End] = xR[iStart] - 1.278481 * 1.278481 * incrementX;
+      yAlt[i4End] = yR[iStart] + 0.782178 * incrementY;
+      let massPointAlt = xR[iStart] + xR[iEnd] + xAlt[i3End] + xAlt[i4End] + yR[iStart] + yR[iEnd] + yAlt[i3End] + yAlt[i4End];
+      if (Math.abs(massPointAlt) < Math.abs(massPoint)) {
+         xR = xAlt;
+         yR = yAlt;
+      };
    };
 };
 
@@ -91,21 +106,17 @@ function resultOutput() {
    document.getElementById("outputTextField").value = outputStringFin;
 };
 
+// ~~~ Функция ВВОДА _УГЛА_ПОВОРОТА_ полигона ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 let isPolygonAngle = () => {
-   polygonAngleRad = parseFloat(
-      document.getElementById("polygonAngleID")
-      .value.replace(",", ".")  * Math.PI / 180
-      );
+   polygonAngleRad = parseFloat(document.getElementById("polygonAngleID").value.replace(",", ".")  * Math.PI / 180);
    document.getElementById("polygonAngleID").value = Math.round(1000*polygonAngleRad * 180/Math.PI)/1000;
    polygonRotation();
    resultOutput(); 
 };
 
-// ~~~ Функция обработки окна ввода _ШРИНЫ_ПОЛИГОНА_ ~~~
+// ~~~ Функция обработки окна ВВОДА _ШРИНЫ_ПОЛИГОНА_ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 let isPolygoneWidth = () => {
-   polygoneWidth = parseFloat(
-      document.getElementById("polygoneWidthID").value.replace(",", ".")
-   );
+   polygoneWidth = parseFloat(document.getElementById("polygoneWidthID").value.replace(",", "."));
    document.getElementById("polygoneWidthID").value = polygoneWidth;
    polygonCenterCalculation();
    absoluteToRelativeCoordinatesConversion();
@@ -114,10 +125,10 @@ let isPolygoneWidth = () => {
    resultOutput();  
 };
 
-// ~~~ Функция обработки окна ввода _КООРДИНАТЫ_ПЕРЕМЕЩЕНИЯ_ полигона ~~~
+// ~~~ Функция ВВОДА _КООРДИНАТЫ_ПЕРЕМЕЩЕНИЯ_ полигона ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 let isPointToMoveXY = () => { EnterPointToMove(); };
 
-// ~~~ Функция ВВОДА _КООРДИНАТЫ_ПЕРЕМЕЩЕНИЯ_ полигона ~~~
+// ~~~ Функция обработки окна ввода координаты перемещения полигона
 function EnterPointToMove() {
    let pointToMove = document.getElementById("pointToMoveXYID").value;
    if (pointToMove[pointToMove.length - 1] === "°") {
@@ -133,7 +144,7 @@ function EnterPointToMove() {
    resultOutput();  
 };
 
-// ~~~ Функция определение индексов координат начала и конца наибольшей грани полигона ~~~
+// ~~~ Функция определение индексов координат начала и конца наибольшей грани полигона 
 function maxSideIdxs() {
    let max = 0;
    let iMax = 0;
