@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>WGS84 TransForm Calc</title>
+  <style> 
+    body {  box-sizing: border-box; margin: 0; padding: 0;  background-color: white; font-family: "lato", sans-serif;  }
+	.form {  background-color: white; width: 500px; height: 400px; border-radius: 8px;  padding: 40px 40px; padding-right: 32px;  box-shadow: 0 10px 25px rgba(55, 20, 155, .2);   }
+	.title {  font-size: 30px;  margin-bottom: 20px;  color: #6a148a;  position: relative;  top: -27px;   }
+	.inputContainer {  position: relative;  height: 45px;  width: 90%;  margin-bottom: 17px;   }
+	.inputContainerShort {  position: relative;  height: 45px;  width: 100%;  margin-bottom: 17px;   }
+	.input {  position: absolute;  top: 0px;  left: 0px;  height: 100%;  width: 100%;  border: 1px solid #DADCE0;  border-radius: 4px;  font-size: 16px;
+              padding: 0 20px;  outline: none;  background: none;  z-index: 1;  }
+    .label {  position: absolute;  top: 15px;  left: 75px;  padding: 0 3px;  background-color: white;  color: #DADCE0;  font-size: 16px;  transition: 0.5s; z-index: 0;  }
+	::placeholder {  color: transparent;   }
+	.submitBtn {  display: block;  margin-right: 5px;  margin-left: auto;  padding: 3px 20px;  border: none;  background-color: purple;  color: white;  border-radius: 4px;
+                  cursor: pointer;  font-size: 16px;  margin-top: 28px;  box-shadow: 0 10px 25px rgba(106, 20, 138, .25);   }
+	.submitBtn:hover {  background-color: #9867C5;  transform: translateY(-1px);  }
+	.input:focus + .label {  top: -7px;  left: 10px;  z-index: 10;  font-size: 12px;  font-weight: 600;  color: purple;   }
+	.input:not(:placeholder-shown)+ .label {  top: -7px;  left: 10px;  z-index: 10;  font-size: 12px;  font-weight: 600;   }
+	.input:focus {  border: 2px solid #d3a7d3;  }
+  </style>
+</head>
+<body>
+  <div style="display: flex; justify-content: center; align-items: center;  height: 100vh">
+	<form action="" class="form">
+      	<div style="display: grid;  grid-template-columns: 45% 10% 44.7%">
+			<div class="inputContainerShort"> <h1 class="title">WGS84-Calc</h1> </div>  
+			<div class="inputContainerShort"></div>		
+			<div class="inputContainerShort"> <input type="submit" class="submitBtn" value="Clipboard result!"> </div>
+		</div>
+	  <div class="inputContainer" style = "height: 110px">
+		<textarea type="text" class="input" placeholder="a" style="font-family: sans-serif; font-size: 16px; overflow: hidden; min-height: 100px; max-height: 100px; 
+							min-width: 100%; max-width: 100%; padding-top: 10px;" name="input" id="polygonVerticesID" onfocusout="isPolygonVertices()" ></textarea>
+			<label for="" class="label">Input Coordinates</label>
+      </div>
+	  <div style="display: grid;  grid-template-columns: 13% 10% 13% 10% 44%">
+		<div class="inputContainerShort">
+			<input type="text" class="input" placeholder="a" value="0.0" id="polygonAngleID" onfocusout="isPolygonAngle()">
+			<label for="" class="label" style = "left: 33px;">Angle</label>
+		</div>		
+	    <div class="inputContainerShort"></div>	  
+		<div class="inputContainerShort">
+			<input type="text" class="input" placeholder="a" value="600" id="polygoneWidthID" onfocusout="isPolygoneWidth()">
+			<label for="" class="label" style = "left: 33px;">Width</label>
+		</div>		
+		<div class="inputContainerShort"></div>
+		<div class="inputContainerShort">
+			<input type="text" class="input" placeholder="a" value="0.0, 0.0" id="pointToMoveXYID" onfocusout="isPointToMoveXY()" value="0.0, 0.0">
+			<label for="" class="label" style = "left: 33px;">Point to Move</label>
+		</div>	  
+	  </div>	  
+	  <div class="inputContainer" style = "height: 200px">
+		<textarea type="text" class="input" placeholder="a" onfocusout="copyToClipboard()" style=" font-family: sans-serif; font-size: 16px; overflow: hidden;
+						min-height: 130px; max-height: 100px; min-width: 100%; max-width: 100%; padding-top: 10px;" name="output" id="outputTextFieldID"></textarea>
+			<label for="" class="label">Output Result Coordinates</label>
+      </div>
+    </form>
+  </div>
+  <script>
+
+let polygoneWidth = 0;
+let truePolygoneWidth = 0;
+let polygonAngleRad = 0;
+let xPointToMove = 0;
+let yPointToMove = 0;
+let x = [];
+let y = [];
+let xR = [];
+let yR = [];
+let xFin = [];
+let yFin = [];
+let xInitial = 0;
+let yInitial = 0;
+let maxSideAngle = 0;
+let polygonEdgesNumber = 0;
+let deltaAngleTmp = [];
+let nextDx = 0;
+let nextDy = 0;
+
+let isPolygonVertices = () => {
+let polygonVerticesString = document.getElementById("polygonVerticesID").value.split(",").map((item) => parseFloat(item));
+x = [];
+y = [];
+let lng = polygonVerticesString.length - 1;
+for (let i = 0; i < lng; i += 2) {
+   y.push(polygonVerticesString[i]);
+   x.push(polygonVerticesString[i + 1]);
+};
+if (x.length != y.length) { alert( "Что-то не так с введёнными координатами! Число X-координат не равно числу Y-координат!!!", x.length, y.length ); };
+polygonEdgesNumber = x.length;
+polygonCenterCalculation();
+absoluteToRelativeCoordinatesConversion();
+polygonOrthogonalization();
+polygonRotation();
+resultOutput();   
+};
+
+function polygonCenterCalculation() {
+xInitial = x.reduce( (i, ii) => i + ii, 0) / polygonEdgesNumber;
+yInitial = y.reduce( (i, ii) => i + ii, 0) / polygonEdgesNumber;
+xPointToMove = xInitial;
+yPointToMove = yInitial;
+document.getElementById("pointToMoveXYID").value = r07(xPointToMove) + ", " + r07(yPointToMove);
+};
+
+function absoluteToRelativeCoordinatesConversion() {
+xR = x.map((item) => (item - xInitial));
+yR = y.map((item) => (item - yInitial));
+};
+
+function polygonOrthogonalization() {
+if (polygonEdgesNumber === 4) {
+   let [iStart, iEnd] = maxSideIdxs();
+   let i3End = (iEnd + 1) % polygonEdgesNumber;
+   let i4End = (i3End + 1) % polygonEdgesNumber;
+   let tmpDiff = (x[iEnd] - x[iStart]) ? (x[iEnd] - x[iStart]) : 0.0000000000000000001;
+   let dYdX = (y[iEnd] - y[iStart]) / tmpDiff;
+   maxSideAngle = Math.atan(dYdX);
+   polygoneWidth = document.getElementById("polygoneWidthID").value;
+   truePolygoneWidth = polygoneWidth / (1+0.278481*Math.abs(Math.sin(maxSideAngle)))
+   let incrementY = (truePolygoneWidth * 0.000000335) / Math.sqrt(1 + dYdX**2); 
+   let incrementX = (truePolygoneWidth * 0.000000262) * dYdX / Math.sqrt(1 + dYdX**2);
+   xR[i3End] = xR[iEnd] + 1.278481 * 1.278481 * incrementX;
+   yR[i3End] = yR[iEnd] - 0.782178 * incrementY;
+   xR[i4End] = xR[iStart] + 1.278481 * 1.278481 * incrementX;
+   yR[i4End] = yR[iStart] - 0.782178 * incrementY;
+   let massPoint = xR[iStart] + xR[iEnd] + xR[i3End] + xR[i4End] + yR[iStart] + yR[iEnd] + yR[i3End] + yR[i4End];
+   let xAlt = xR.slice();
+   let yAlt = yR.slice();
+   xAlt[i3End] = xR[iEnd] - 1.278481 * 1.278481 * incrementX;
+   yAlt[i3End] = yR[iEnd] + 0.782178 * incrementY;
+   xAlt[i4End] = xR[iStart] - 1.278481 * 1.278481 * incrementX;
+   yAlt[i4End] = yR[iStart] + 0.782178 * incrementY;
+   let massPointAlt = xR[iStart] + xR[iEnd] + xAlt[i3End] + xAlt[i4End] + yR[iStart] + yR[iEnd] + yAlt[i3End] + yAlt[i4End];
+   if (Math.abs(massPointAlt) < Math.abs(massPoint)) {
+      xR = xAlt;
+      yR = yAlt;
+   };
+};
+};
+
+function polygonRotation() {
+for (let i = 0; i < polygonEdgesNumber; i++) {
+   xFin[i] = r07(1.278481*(0.782178*xR[i]*Math.cos(-1*polygonAngleRad) - yR[i]*Math.sin(-1*polygonAngleRad)));
+   yFin[i] = r07(0.782178*xR[i]*Math.sin(-1*polygonAngleRad) + yR[i]*Math.cos(-1*polygonAngleRad));
+};
+};
+
+function resultOutput() {
+let outputStringFin = (r07(yFin[0]+yPointToMove) + ',' + r07(xFin[0]+xPointToMove));
+for (let i = 1; i < polygonEdgesNumber; i++) {
+   outputStringFin += ',' + r07(yFin[i] + yPointToMove) + ',' + r07(xFin[i] + xPointToMove);
+};
+document.getElementById("outputTextFieldID").value = outputStringFin;
+};
+
+let isPolygonAngle = () => {
+polygonAngleRad = parseFloat(document.getElementById("polygonAngleID").value.replace(",", ".")  * Math.PI / 180);
+document.getElementById("polygonAngleID").value = Math.round(1000*polygonAngleRad * 180/Math.PI)/1000;
+polygonRotation();
+resultOutput(); 
+};
+
+let isPolygoneWidth = () => {
+polygoneWidth = parseFloat(document.getElementById("polygoneWidthID").value.replace(",", "."));
+document.getElementById("polygoneWidthID").value = polygoneWidth;
+polygonCenterCalculation();
+absoluteToRelativeCoordinatesConversion();
+polygonOrthogonalization();
+polygonRotation();
+resultOutput();  
+};
+
+let isPointToMoveXY = () => { EnterPointToMove(); };
+
+function EnterPointToMove() {
+let pointToMove = document.getElementById("pointToMoveXYID").value;
+if (pointToMove[pointToMove.length - 1] === "°") {
+   isPointFromGoogleEarth = false;
+   pointToMove.pop;
+   pointToMove = pointToMove.replace("°", ",").split(",").map((item) => parseFloat(item));
+   [xPointToMove, yPointToMove] = [pointToMove[1], pointToMove[0]];
+} else {
+   pointToMove = pointToMove.split(",").map((item) => parseFloat(item));
+   [xPointToMove, yPointToMove] = [pointToMove[0], pointToMove[1]];
+}
+document.getElementById("pointToMoveXYID").value = r07(xPointToMove) + ", " + r07(yPointToMove);
+resultOutput();  
+};
+
+function maxSideIdxs() {
+let max = 0;
+let iMax = 0;
+let iiMax = 0;
+let ii = 0;
+for (let i = 0; i < polygonEdgesNumber; i++) {
+   ii = (i + 1) % polygonEdgesNumber;
+   dist = Math.hypot(x[i] - x[ii], y[i] - y[ii]);
+   if (dist > max) { max = dist; iMax = i; iiMax = ii; }
+};
+return [iMax, iiMax];   
+};
+
+function r07(q){ return Math.round(q * 10000000)/10000000 } ;
+
+function copyToClipboard() {
+let copyText = document.getElementById("outputTextFieldID").value;
+navigator.clipboard.writeText(copyText).then(() => {});
+}
+  </script>
+</body>
+</html>

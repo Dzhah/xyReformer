@@ -30,44 +30,33 @@
 			<div class="inputContainerShort"> <input type="submit" class="submitBtn" value="Clipboard result!"> </div>
 		</div>
 	  <div class="inputContainer" style = "height: 110px">
-		<textarea type="text" class="input" placeholder="a" style=" font-family: sans-serif; font-size: 16px; overflow: hidden;
-						min-height: 100px; max-height: 100px; min-width: 100%; max-width: 100%; padding-top: 10px; "
-			name="intput" id="outputTextField" ></textarea>
+		<textarea type="text" class="input" placeholder="a" style="font-family: sans-serif; font-size: 16px; overflow: hidden; min-height: 100px; max-height: 100px; 
+							min-width: 100%; max-width: 100%; padding-top: 10px;" name="input" id="polygonVerticesID" onfocusout="isPolygonVertices()" ></textarea>
 			<label for="" class="label">Input Coordinates</label>
       </div>
-	  <div style="display: grid;  grid-template-columns: 15% 10% 15% 10% 40%">
+	  <div style="display: grid;  grid-template-columns: 13% 10% 13% 10% 44%">
 		<div class="inputContainerShort">
-			<input type="text" class="input" placeholder="a" value="0.0">
+			<input type="text" class="input" placeholder="a" value="0.0" id="polygonAngleID" onfocusout="isPolygonAngle()">
 			<label for="" class="label" style = "left: 33px;">Angle</label>
 		</div>		
 	    <div class="inputContainerShort"></div>	  
 		<div class="inputContainerShort">
-			<input type="text" class="input" placeholder="a" value="600">
+			<input type="text" class="input" placeholder="a" value="600" id="polygoneWidthID" onfocusout="isPolygoneWidth()">
 			<label for="" class="label" style = "left: 33px;">Width</label>
 		</div>		
 		<div class="inputContainerShort"></div>
 		<div class="inputContainerShort">
-			<input type="text" class="input" placeholder="a" value="0.0, 0.0">
+			<input type="text" class="input" placeholder="a" value="0.0, 0.0" id="pointToMoveXYID" onfocusout="isPointToMoveXY()" value="0.0, 0.0">
 			<label for="" class="label" style = "left: 33px;">Point to Move</label>
 		</div>	  
 	  </div>	  
 	  <div class="inputContainer" style = "height: 200px">
 		<textarea type="text" class="input" placeholder="a" onfocusout="copyToClipboard()" style=" font-family: sans-serif; font-size: 16px; overflow: hidden;
-						min-height: 130px; max-height: 100px; min-width: 100%; max-width: 100%; padding-top: 10px; "
-			name="output" id="outputTextFieldID" ></textarea>
+						min-height: 130px; max-height: 100px; min-width: 100%; max-width: 100%; padding-top: 10px;" name="output" id="outputTextFieldID"></textarea>
 			<label for="" class="label">Output Result Coordinates</label>
       </div>
     </form>
   </div>
-<script>
-  function copyToClipboard() {
-    var copyText = document.getElementById("outputTextFieldID").value;
-    navigator.clipboard.writeText(copyText).then(() => {
-        // Alert the user that the action took place.
-        // Nobody likes hidden stuff being done under the hood!
-        console.log("Copied to clipboard");
-    });
-  }
-</script>
+  <script src="scrpt.js"></script>
 </body>
 </html>

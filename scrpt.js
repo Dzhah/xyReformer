@@ -45,7 +45,7 @@ function polygonCenterCalculation() {
    yInitial = y.reduce( (i, ii) => i + ii, 0) / polygonEdgesNumber;
    xPointToMove = xInitial;
    yPointToMove = yInitial;
-   document.getElementById("pointToMoveXYID").value = xPointToMove + ', ' + yPointToMove;
+   document.getElementById("pointToMoveXYID").value = r07(xPointToMove) + ", " + r07(yPointToMove);
 };
 
 // ~~~ Функция преобразования абсолютных координат вершин полигона в относительные
@@ -103,7 +103,9 @@ function resultOutput() {
    for (let i = 1; i < polygonEdgesNumber; i++) {
       outputStringFin += ',' + r07(yFin[i] + yPointToMove) + ',' + r07(xFin[i] + xPointToMove);
    };
-   document.getElementById("outputTextField").value = outputStringFin;
+   console.log('outputStringFin :', outputStringFin);
+   document.getElementById("outputTextFieldID").value = outputStringFin;
+   
 };
 
 // ~~~ Функция ВВОДА _УГЛА_ПОВОРОТА_ полигона ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
@@ -140,7 +142,7 @@ function EnterPointToMove() {
       pointToMove = pointToMove.split(",").map((item) => parseFloat(item));
       [xPointToMove, yPointToMove] = [pointToMove[0], pointToMove[1]];
    }
-   document.getElementById("pointToMoveXYID").value = xPointToMove + ", " + yPointToMove;
+   document.getElementById("pointToMoveXYID").value = r07(xPointToMove) + ", " + r07(yPointToMove);
    resultOutput();  
 };
 
@@ -160,6 +162,12 @@ function maxSideIdxs() {
 
 // ~~~ Функция округление до 7-го знака после запятой
 function r07(q){ return Math.round(q * 10000000)/10000000 } ;
+
+// ~~~ Функция копирования в CLipBoard содержимого окна вывода
+function copyToClipboard() {
+   let copyText = document.getElementById("outputTextFieldID").value;
+   navigator.clipboard.writeText(copyText).then(() => {});
+ }
 
 /*
 
